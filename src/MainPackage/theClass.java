@@ -7,7 +7,7 @@ public class theClass {
 	static double seed = Math.random();
 	
 	public static double rand(double a){
-		a = ((seed*23427.3)+425568)%1;
+		a = ((seed*23427.32)+425568)%1;
 		seed = a;
 		return a;
 	}
@@ -16,16 +16,24 @@ public class theClass {
 		//All dem vars'
 		int xx = 0;
 		int yy = 0;
-		/*int length = 10000;
+		/*int width = 10000;
 		int height = 1000;**/
-		int length = 200;
+		int width = 200;
 		int height = 100;
+		int flatTime = 0;
+		int lakeMake = 0;
 		String showTime = "";
 		
-		System.out.println("Creatind World");
+		//type 0 = mountainous
+		//type 1 = flatgrass
+		int type = 0;
+		
+		System.out.println(seed);
+		
+		System.out.println("Creatind Blank World");
 		
 		//Fill the thing with 0's
-		int land[][] = new int[height][length];
+		int land[][] = new int[height][width];
 		for(int i = 0;i<land.length;i++){
 			for(int ii = 0;ii<land[i].length;ii++){
 				land[i][ii]=0;
@@ -38,15 +46,67 @@ public class theClass {
 
 		//Create the basic LAND
 		yy = height/2;
-		for(int i = 0;i<length;i++){
+		for(int i = 0;i<width;i++){
 			land[yy][i]=1;
-			yy+=1-(int)(rand(seed)*3);
+			if(type == 0){
+				if(flatTime == 0&&lakeMake==0){
+					yy+=1-(int)(rand(seed)*3);
+				}
+				else if(flatTime>0){
+					flatTime-=1;
+				}
+				else if(lakeMake>1){
+					land[yy][i]=7;
+					land[yy+1][i]=7;
+					land[yy+2][i]=2;
+					lakeMake-=1;
+				}
+				else if(lakeMake==1){
+					land[yy][i]=7;
+					land[yy+1][i]=2;
+					lakeMake=0;
+				}
+			}
+			else if(type==1){
+				if((int)(rand(seed)*20)==1){
+					yy+=1-(int)(rand(seed)*3);
+				}
+			}
+			
+			//SPECIAL FORMATIONS::::::::::::::::::::::::;
+			
+			//Cliff:
+			if(type == 0){
+				if((int)(rand(seed)*(width/2))==2){
+					yy+=10-(int)(rand(seed)*20);
+				}
+			}
+			
+			//Flatland
+			if((int)(rand(seed)*(width/2))==2){
+				flatTime = 5+(int)(rand(seed)*15);
+			}
+			
+			//Lake
+			if((int)(rand(seed)*(width))==2){
+				try{
+					lakeMake = (int)(rand(seed)*10);
+					land[yy][i]=7;
+					land[yy+1][i]=2;
+				}
+				catch(ArrayIndexOutOfBoundsException lll){
+					System.out.println("[lake out of bounds]");
+				}
+			}
+			
 			if(yy<2){
 				yy=2;
 			}
 			if(yy>height-2){
 				yy=height-2;
 			}
+			
+			//Lake:
 		}
 		
 		System.out.println("Filling Ground");
@@ -59,6 +119,7 @@ public class theClass {
 		//4 = metal
 		//5 = wood
 		//6 = leaves
+		//7 = water
 		for(int i = 0;i<land.length;i++){
 			for(int ii = 0;ii<land[i].length;ii++){
 				
@@ -78,7 +139,7 @@ public class theClass {
 				//CHECK DIRECTLY BELOW
 				if(i<height-2){
 					//plant a tree
-					if(land[i+1][ii]==1){
+					if(land[i+1][ii]==1&&land[i][ii]==0){
 						if(i>10&&(int)(rand(seed)*15)==12){
 							System.out.println("Planting A Tree");
 							land[i][ii]=5;
@@ -115,7 +176,7 @@ public class theClass {
 		try{
 			//THE IMMEDIATE NEXT LINE DETERMINES RELATIVE FREQUENCY OF STONES/METAL!
 			for(int i = 0;i<40+(int)(rand(seed)*40);i++){
-				xx=(int)(rand(seed)*length);
+				xx=(int)(rand(seed)*width);
 				yy=(int)(rand(seed)*height);
 				//put stones on dirt!
 				if(land[yy][xx]==2){
